@@ -91,7 +91,7 @@ export class ToAREPLLogic {
             this.restartedLastTime = false;
         }
         else {
-            data.evalCode = `from config import Config\nprint(Config.fromfile("${data.filePath}").pretty_text)`
+            data.evalCode = `from mmconfig import Config\nprint(Config.fromfile("${data.filePath}").pretty_text)`
             this.PythonEvaluator.execCode(data)
         }
 
