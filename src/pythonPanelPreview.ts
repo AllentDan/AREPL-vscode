@@ -98,7 +98,7 @@ if r.status_code == 200:
         <div id="footer">
         <p style="margin:0px;">
             report an <a href="https://github.com/almenon/arepl-vscode/issues">issue</a>  |
-            ⭐ <a href="https://marketplace.visualstudio.com/items?itemName=almenon.arepl#review-details">rate me</a> ⭐ |
+            ⭐ <a href="https://marketplace.visualstudio.com/items?itemName=Allent.arepl#review-details">rate me</a> ⭐ |
             talk on <a href="https://gitter.im/arepl/lobby">gitter</a> |
                 <a href="https://twitter.com/intent/tweet?button_hashtag=arepl" id="twitterButton">
                     <i id="twitterIcon"></i>Tweet #arepl</a>

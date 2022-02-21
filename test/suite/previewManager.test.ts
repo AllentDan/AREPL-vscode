@@ -10,36 +10,36 @@ import { EOL } from "os";
  */
 suite("PreviewManager and pythonPanelPreview Tests", () => {
 
-    const arepl = vscode.extensions.getExtension("almenon.arepl")!;
+    const arepl = vscode.extensions.getExtension("Allent.arepl")!;
     let editor: vscode.TextEditor
     let panel: vscode.WebviewPanel
     let previewManager: PreviewManager
 
     const mockContext: any = {
-        asAbsolutePath: (file: string)=>{
+        asAbsolutePath: (file: string) => {
             return __dirname + "/" + file
         },
         extensionPath: arepl.extensionPath,
     }
 
-    suiteSetup(function(done){
-        vscodeUtils.newUnsavedPythonDoc("").then((newEditor)=>{
+    suiteSetup(function (done) {
+        vscodeUtils.newUnsavedPythonDoc("").then((newEditor) => {
             editor = newEditor
             previewManager = new PreviewManager(mockContext);
 
-            previewManager.startArepl(editor).then((promiseResults)=>{
+            previewManager.startArepl(editor).then((promiseResults) => {
                 panel = promiseResults[0]
                 console.log("preview panel started")
                 done()
-            }).catch((err)=>done(err))
+            }).catch((err) => done(err))
         })
     })
 
-    test("default imports should be inserted", function(){
+    test("default imports should be inserted", function () {
         assert.equal(editor.document.getText(), "from arepl_dump import dump" + EOL)
     });
 
-    test("webview should be displayed", function(){
+    test("webview should be displayed", function () {
         assert.equal(panel.visible, true)
     });
 
@@ -55,10 +55,10 @@ suite("PreviewManager and pythonPanelPreview Tests", () => {
     //     }, done)
     // });
 
-    suiteTeardown(function(done){
+    suiteTeardown(function (done) {
         previewManager.dispose()
         setTimeout(() => {
-            vscode.commands.executeCommand("workbench.action.closeActiveEditor").then(()=>{
+            vscode.commands.executeCommand("workbench.action.closeActiveEditor").then(() => {
                 done()
             })
         }, 250);

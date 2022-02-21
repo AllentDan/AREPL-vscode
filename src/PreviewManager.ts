@@ -66,7 +66,7 @@ export default class PreviewManager {
 
     startArepl(mockEditor: vscode.TextEditor = null) {
         // see https://github.com/Microsoft/vscode/issues/46445
-        vscode.commands.executeCommand("setContext", "arepl", true)
+        vscode.commands.executeCommand("setContext", "config-view", true)
 
         this.startDisposables()
 
@@ -165,7 +165,7 @@ export default class PreviewManager {
     }
 
     dispose() {
-        vscode.commands.executeCommand("setContext", "arepl", false)
+        vscode.commands.executeCommand("setContext", "config-view", false)
 
         if (this.PythonEvaluator.pyshell != null && this.PythonEvaluator.pyshell.childProcess != null) {
             this.PythonEvaluator.stop()
