@@ -14,19 +14,19 @@ export function activate(context: vscode.ExtensionContext) {
         previewManager.startArepl();
     });
 
-    const newAreplSession = vscode.commands.registerCommand("extension.newAREPLSession", ()=>{
+    const newAreplSession = vscode.commands.registerCommand("extension.newAREPLSession", () => {
         vscodeUtils.newUnsavedPythonDoc(vscodeUtils.getHighlightedText())
-            .then(()=>{previewManager.startArepl()});
+            .then(() => { previewManager.startArepl() });
     });
 
-    const closeArepl = vscode.commands.registerCommand("extension.closeAREPL", ()=>{
+    const closeArepl = vscode.commands.registerCommand("extension.closeAREPL", () => {
         previewManager.dispose()
     });
 
     // exact same as above, just defining command so users are aware of the feature
-    const areplOnHighlightedCode = vscode.commands.registerCommand("extension.newAREPLSessionOnHighlightedCode", ()=>{
+    const areplOnHighlightedCode = vscode.commands.registerCommand("extension.newAREPLSessionOnHighlightedCode", () => {
         vscodeUtils.newUnsavedPythonDoc(vscodeUtils.getHighlightedText())
-            .then(()=>{previewManager.startArepl()});
+            .then(() => { previewManager.startArepl() });
     });
 
     const executeAREPL = vscode.commands.registerCommand("extension.executeAREPL", () => {

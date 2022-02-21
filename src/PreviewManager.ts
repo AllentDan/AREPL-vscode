@@ -1,5 +1,5 @@
 "use strict"
-import {PythonEvaluator, ExecArgs} from "arepl-backend"
+import { PythonEvaluator, ExecArgs } from "arepl-backend"
 import areplUtils from "./areplUtilities"
 import * as vscode from "vscode"
 import { EnvironmentVariablesProvider } from "./env/variables/environmentVariablesProvider"
@@ -7,9 +7,9 @@ import { EnvironmentVariablesService } from "./env/variables/environment"
 import { join, basename } from "path";
 import { PreviewContainer } from "./previewContainer"
 import Reporter from "./telemetry"
-import {ToAREPLLogic} from "./toAREPLLogic"
+import { ToAREPLLogic } from "./toAREPLLogic"
 import { PythonShell } from "python-shell"
-import {settings} from "./settings"
+import { settings } from "./settings"
 import printDir from "./printDir";
 import { PlatformService } from "./env/platform/platformService"
 import { PathUtils } from "./env/platform/pathUtils"
@@ -31,6 +31,7 @@ export default class PreviewManager {
     subscriptions: vscode.Disposable[] = []
     highlightDecorationType: vscode.TextEditorDecorationType
     pythonEditor: vscode.TextEditor;
+    activeFileName: string = '';
 
     /**
      * assumes a text editor is already open - if not will error out
@@ -40,7 +41,7 @@ export default class PreviewManager {
         this.previewContainer = new PreviewContainer(this.reporter, context)
     }
 
-    startDisposables(){
+    startDisposables() {
         this.runningStatus = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
         this.runningStatus.text = "Running python..."
         this.runningStatus.tooltip = "AREPL is currently running your python file.  Close the AREPL preview to stop"
@@ -51,7 +52,7 @@ export default class PreviewManager {
         })
     }
 
-    async loadAndWatchEnvVars(){
+    async loadAndWatchEnvVars() {
         const platformService = new PlatformService()
         const envVarsService = new EnvironmentVariablesService(new PathUtils(platformService.isWindows))
         const workspaceService = new WorkspaceService()
@@ -63,45 +64,46 @@ export default class PreviewManager {
         return e.getEnvironmentVariables(areplUtils.getEnvFilePath(), vscodeUtils.getCurrentWorkspaceFolderUri())
     }
 
-    startArepl(mockEditor: vscode.TextEditor = null){
+    startArepl(mockEditor: vscode.TextEditor = null) {
         // see https://github.com/Microsoft/vscode/issues/46445
         vscode.commands.executeCommand("setContext", "arepl", true)
 
         this.startDisposables()
 
-        if(!vscode.window.activeTextEditor){
+        if (!vscode.window.activeTextEditor) {
             vscode.window.showErrorMessage("no active text editor open")
             return
         }
         this.pythonEditor = mockEditor || vscode.window.activeTextEditor
         this.pythonEditorDoc = this.pythonEditor.document
 
-        let handlersBoundPromise: Thenable<void> = Promise.resolve().then(()=>{})
-        if(this.pythonEditorDoc.isUntitled && this.pythonEditorDoc.getText() == "") {
+        let handlersBoundPromise: Thenable<void> = Promise.resolve().then(() => { })
+        if (this.pythonEditorDoc.isUntitled && this.pythonEditorDoc.getText() == "") {
             handlersBoundPromise = areplUtils.insertDefaultImports(this.pythonEditor).then(
                 this.subscribeHandlersToDoc.bind(this)
             )
         }
-        else{
+        else {
             this.subscribeHandlersToDoc()
         }
-        
-        const pythonStartedPromise = this.startAndBindPython().then(()=>{
+
+        const pythonStartedPromise = this.startAndBindPython().then(() => {
             let panel = this.previewContainer.start(basename(this.pythonEditorDoc.fileName), this.PythonEvaluator);
-            panel.onDidDispose(()=>this.dispose(), this, this.subscriptions)
+            panel.onDidDispose(() => this.dispose(), this, this.subscriptions)
             this.subscriptions.push(panel)
+            this.initDocRun()
 
             return panel;
         })
-        return Promise.all([pythonStartedPromise, handlersBoundPromise]).then((promiseResults)=>{
-            if(settings().get<boolean>("skipLandingPage")){
+        return Promise.all([pythonStartedPromise, handlersBoundPromise]).then((promiseResults) => {
+            if (settings().get<boolean>("skipLandingPage")) {
                 this.onAnyDocChange(this.pythonEditorDoc);
             }
             return promiseResults
         })
     }
 
-    runArepl(){
+    runArepl() {
         this.onAnyDocChange(this.pythonEditorDoc)
     }
 
@@ -110,11 +112,11 @@ export default class PreviewManager {
      * ex: x=1; print(x)
      * Then runs it
      */
-    printDir(){
+    printDir() {
 
-        if(this.pythonEditor != vscode.window.activeTextEditor) return
+        if (this.pythonEditor != vscode.window.activeTextEditor) return
         const selection = this.pythonEditor.selection
-        if(!selection.isSingleLine) return
+        if (!selection.isSingleLine) return
         let codeLines = this.pythonEditor.document.getText()
 
         let codeLinesArr = printDir(codeLines.split(vscodeUtils.eol(this.pythonEditor.document)), selection.start.line)
@@ -126,13 +128,13 @@ export default class PreviewManager {
         const selection = editor.selection
         let block: vscode.Range = null;
 
-        if(selection.isEmpty){ // just a cursor
+        if (selection.isEmpty) { // just a cursor
             block = vscodeUtils.getBlockOfText(editor, selection.start.line)
         }
-        else{
+        else {
             block = new vscode.Range(selection.start, selection.end)
         }
-           
+
         let codeLines = editor.document.getText(block)
         // hack: we want accurate line # info
         // so we prepend lines to put codeLines in right spot
@@ -152,11 +154,11 @@ export default class PreviewManager {
         this.PythonEvaluator.execCode(data)
         this.runningStatus.show()
 
-        if(editor){
+        if (editor) {
             editor.setDecorations(this.highlightDecorationType, [block])
         }
 
-        setTimeout(()=>{
+        setTimeout(() => {
             // clear decorations
             editor.setDecorations(this.highlightDecorationType, [])
         }, 100)
@@ -165,7 +167,7 @@ export default class PreviewManager {
     dispose() {
         vscode.commands.executeCommand("setContext", "arepl", false)
 
-        if(this.PythonEvaluator.pyshell != null && this.PythonEvaluator.pyshell.childProcess != null){
+        if (this.PythonEvaluator.pyshell != null && this.PythonEvaluator.pyshell.childProcess != null) {
             this.PythonEvaluator.stop()
         }
 
@@ -173,12 +175,12 @@ export default class PreviewManager {
         this.disposable.dispose();
 
         this.runningStatus.dispose();
-        
-        this.reporter.sendFinishedEvent(settings()).finally(()=>{
+
+        this.reporter.sendFinishedEvent(settings()).finally(() => {
             this.reporter.dispose();
         })
 
-        if(vscode.window.activeTextEditor){
+        if (vscode.window.activeTextEditor) {
             vscode.window.activeTextEditor.setDecorations(this.previewContainer.errorDecorationType, [])
         }
         this.highlightDecorationType.dispose()
@@ -187,22 +189,22 @@ export default class PreviewManager {
     /**
      * show err message to user if outdated version of python
      */
-    private warnIfOutdatedPythonVersion(pythonPath: string){
-        PythonShell.getVersion(`"${pythonPath}"`).then((out)=>{
+    private warnIfOutdatedPythonVersion(pythonPath: string) {
+        PythonShell.getVersion(`"${pythonPath}"`).then((out) => {
             let version = out.stdout ? out.stdout : out.stderr
-            if(version?.includes("Python 3.4") || version?.includes("Python 2")){
+            if (version?.includes("Python 3.4") || version?.includes("Python 2")) {
                 vscode.window.showErrorMessage(`AREPL no longer supports ${version}.
                 Please upgrade or set AREPL.pythonPath to a diffent python.
                 AREPL needs python 3.7 or greater`)
             }
-            if(version){
+            if (version) {
                 this.reporter.pythonVersion = version.trim()
             }
-        }).catch((err: NodeJS.ErrnoException)=>{
+        }).catch((err: NodeJS.ErrnoException) => {
             // if we get spawn error here thats already reported by telemetry
             // so we skip telemetry reporting for this error
             console.error(err)
-            if(err.message.includes("Python was not found but can be installed from the Microsoft Store")){
+            if (err.message.includes("Python was not found but can be installed from the Microsoft Store")) {
                 vscode.window.showErrorMessage(err.message)
             }
         })
@@ -211,7 +213,7 @@ export default class PreviewManager {
     /**
      * starts AREPL python backend and binds print&result output to the handlers
      */
-    private async startAndBindPython(){
+    private async startAndBindPython() {
         const pythonPath = await areplUtils.getPythonPath()
         const pythonOptions = settings().get<string[]>("pythonOptions")
 
@@ -225,19 +227,19 @@ export default class PreviewManager {
             pythonPath,
             env,
         })
-        
+
         try {
             console.log('Starting python with path ' + pythonPath)
             this.PythonEvaluator.start()
         } catch (err) {
             console.debug('caught error in python start: ' + err)
-            if (err instanceof Error){
+            if (err instanceof Error) {
                 const error = `Error running python with command: ${pythonPath} ${pythonOptions.join(' ')}\n${err.stack}`
                 this.previewContainer.displayProcessError(error);
                 // @ts-ignore 
-                this.reporter.sendError(err, error.errno, 'spawn')            
+                this.reporter.sendError(err, error.errno, 'spawn')
             }
-            else{
+            else {
                 console.error(err)
             }
         }
@@ -255,7 +257,7 @@ export default class PreviewManager {
             this.reporter.sendError(err, err.errno, 'spawn')
         })
         this.PythonEvaluator.pyshell.childProcess.on("exit", err => {
-            if(!err) return // normal exit
+            if (!err) return // normal exit
             console.debug('exit handler invoked w/ ' + err)
             this.previewContainer.displayProcessError(`err code: ${err}`);
             this.reporter.sendError(new Error('exit'), err, 'spawn')
@@ -277,55 +279,55 @@ export default class PreviewManager {
     /**
      * binds various funcs to activate upon edit of document / switching of active doc / etc...
      */
-    private subscribeHandlersToDoc(){
+    private subscribeHandlersToDoc() {
         vscode.workspace.onDidSaveTextDocument((e) => {
-            if(settings().get<string>("whenToExecute") == "onSave"){
+            if (settings().get<string>("whenToExecute") == "onSave") {
                 this.onAnyDocChange(e)
             }
         }, this, this.subscriptions)
-        
+
         vscode.workspace.onDidChangeTextDocument((e) => {
             const cachedSettings = settings()
-            if(cachedSettings.get<string>("whenToExecute") == "afterDelay"){
+            if (cachedSettings.get<string>("whenToExecute") == "afterDelay") {
                 let delay = cachedSettings.get<number>("delay");
                 const restartExtraDelay = cachedSettings.get<number>("restartDelay");
                 delay += this.toAREPLLogic.restartMode ? restartExtraDelay : 0
                 this.PythonEvaluator.debounce(this.onAnyDocChange.bind(this, e.document), delay)
             }
         }, this, this.subscriptions)
-        
+
         vscode.workspace.onDidCloseTextDocument((e) => {
-            if(e == this.pythonEditorDoc) this.dispose()
+            if (e == this.pythonEditorDoc) this.dispose()
         }, this, this.subscriptions)
     }
 
 
-    private onAnyDocChange(event: vscode.TextDocument){
-        if(event == this.pythonEditorDoc){
+    private onAnyDocChange(event: vscode.TextDocument) {
+        if (event == this.pythonEditorDoc) {
 
             this.reporter.numRuns += 1
-            if(this.PythonEvaluator.executing){
+            if (this.PythonEvaluator.executing) {
                 this.reporter.numInterruptedRuns += 1
             }
 
             const text = event.getText()
 
             let filePath = ""
-            if(this.pythonEditorDoc.isUntitled){
+            if (this.pythonEditorDoc.isUntitled) {
                 /* user would assume untitled file is in same dir as workspace root */
                 filePath = join(vscodeUtils.getCurrentWorkspaceFolder(false), this.pythonEditorDoc.fileName)
             }
-            else{
+            else {
                 filePath = this.pythonEditorDoc.fileName
             }
 
             try {
                 this.previewContainer.clearStoredData()
                 const codeRan = this.toAREPLLogic.onUserInput(text, filePath, vscodeUtils.eol(event), settings().get<boolean>('showGlobalVars'))
-                if(codeRan) this.runningStatus.show();
+                if (codeRan) this.runningStatus.show();
             } catch (error) {
-                if(error instanceof Error){
-                    if(error.message == "unsafeKeyword"){
+                if (error instanceof Error) {
+                    if (error.message == "unsafeKeyword") {
                         const unsafeKeywords = settings().get<string[]>('unsafeKeywords')
                         this.previewContainer.updateError(null, `unsafe keyword detected. 
 Doing irreversible operations like deleting folders is very dangerous in a live editor. 
@@ -333,14 +335,56 @@ If you want to continue please clear arepl.unsafeKeywords setting.
 Currently arepl.unsafeKeywords is set to ["${unsafeKeywords.join('", "')}"]`, true)
                         return
                     }
-                    else{
+                    else {
                         console.error(error)
                         this.reporter.sendError(error)
-                        this.previewContainer.updateError(null, `internal arepl error: ${error.name} stack: ${error.stack}`, true) 
+                        this.previewContainer.updateError(null, `internal arepl error: ${error.name} stack: ${error.stack}`, true)
                     }
                 }
                 throw error;
             }
-        }        
+        }
+    }
+
+    private initDocRun() {
+        console.log("Runing once")
+        this.activeFileName = this.pythonEditorDoc.fileName
+        this.reporter.numRuns += 1
+        if (this.PythonEvaluator.executing) {
+            this.reporter.numInterruptedRuns += 1
+        }
+
+
+        let filePath = ""
+        if (this.pythonEditorDoc.isUntitled) {
+            /* user would assume untitled file is in same dir as workspace root */
+            filePath = join(vscodeUtils.getCurrentWorkspaceFolder(false), this.pythonEditorDoc.fileName)
+        }
+        else {
+            filePath = this.pythonEditorDoc.fileName
+        }
+
+        try {
+            this.previewContainer.clearStoredData()
+            const codeRan = this.toAREPLLogic.onUserInput('', filePath, '', settings().get<boolean>('showGlobalVars'))
+            if (codeRan) this.runningStatus.show();
+        } catch (error) {
+            if (error instanceof Error) {
+                if (error.message == "unsafeKeyword") {
+                    const unsafeKeywords = settings().get<string[]>('unsafeKeywords')
+                    this.previewContainer.updateError(null, `unsafe keyword detected. 
+    Doing irreversible operations like deleting folders is very dangerous in a live editor. 
+    If you want to continue please clear arepl.unsafeKeywords setting. 
+    Currently arepl.unsafeKeywords is set to ["${unsafeKeywords.join('", "')}"]`, true)
+                    return
+                }
+                else {
+                    console.error(error)
+                    this.reporter.sendError(error)
+                    this.previewContainer.updateError(null, `internal arepl error: ${error.name} stack: ${error.stack}`, true)
+                }
+            }
+            throw error;
+        }
     }
 }

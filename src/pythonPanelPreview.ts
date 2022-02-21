@@ -133,8 +133,7 @@ if r.status_code == 200:
 
         this.css = `<link rel="stylesheet" type="text/css" href="${this.getMediaPath("pythonPanelPreview.css", this.panel.webview)}">`
         this.jsonRendererScript = `<script src="${this.getMediaPath("jsonRenderer.js", this.panel.webview)}"></script>`
-
-        this.panel.webview.html = this.landingPage
+        this.panel.webview.html = this.html
         return this.panel;
     }
 
@@ -191,7 +190,7 @@ if r.status_code == 200:
         // escape any accidental html
         printResults = Utilities.escapeHtml(printResults);
 
-        this.printContainer = `<br><h3>Print Output:</h3><div class="print">${printResults}</div>`
+        this.printContainer = `<br><h3>View Config:</h3><div class="print"><pre><code class="python">${printResults}</code></pre></div>`
         this.throttledUpdate();
     }
 
@@ -257,14 +256,15 @@ if r.status_code == 200:
             <style>${this.customCSS}</style>
             ${this.jsonRendererScript}
             ${this.jsonRendererCode}
+            <link rel="stylesheet"
+                    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+            <script>hljs.initHighlightingOnLoad();</script>
         </head>
         <body>
             ${this.errorContainer}
-            ${printPlacement == "bottom" ?
-                variables + this.printContainer :
-                this.printContainer + variables}
+            ${this.printContainer}
             ${this.timeContainer}
-            ${showFooter ? this.footer : ""}
             <div id="${Math.random()}" style="display:none"></div>
         </body>
         </html>`
