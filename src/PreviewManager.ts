@@ -299,50 +299,55 @@ export default class PreviewManager {
         vscode.workspace.onDidCloseTextDocument((e) => {
             if (e == this.pythonEditorDoc) this.dispose()
         }, this, this.subscriptions)
+
+        vscode.workspace.onDidOpenTextDocument((e) => {
+            if (e != this.pythonEditorDoc) {
+                this.pythonEditorDoc = vscode.window.activeTextEditor.document
+                this.initDocRun()
+            }
+
+        }, this, this.subscriptions)
     }
 
 
     private onAnyDocChange(event: vscode.TextDocument) {
-        if (event == this.pythonEditorDoc) {
+        this.reporter.numRuns += 1
+        if (this.PythonEvaluator.executing) {
+            this.reporter.numInterruptedRuns += 1
+        }
 
-            this.reporter.numRuns += 1
-            if (this.PythonEvaluator.executing) {
-                this.reporter.numInterruptedRuns += 1
-            }
+        const text = event.getText()
 
-            const text = event.getText()
+        let filePath = ""
+        if (this.pythonEditorDoc.isUntitled) {
+            /* user would assume untitled file is in same dir as workspace root */
+            filePath = join(vscodeUtils.getCurrentWorkspaceFolder(false), this.pythonEditorDoc.fileName)
+        }
+        else {
+            filePath = this.pythonEditorDoc.fileName
+        }
 
-            let filePath = ""
-            if (this.pythonEditorDoc.isUntitled) {
-                /* user would assume untitled file is in same dir as workspace root */
-                filePath = join(vscodeUtils.getCurrentWorkspaceFolder(false), this.pythonEditorDoc.fileName)
-            }
-            else {
-                filePath = this.pythonEditorDoc.fileName
-            }
-
-            try {
-                this.previewContainer.clearStoredData()
-                const codeRan = this.toAREPLLogic.onUserInput(text, filePath, vscodeUtils.eol(event), settings().get<boolean>('showGlobalVars'))
-                if (codeRan) this.runningStatus.show();
-            } catch (error) {
-                if (error instanceof Error) {
-                    if (error.message == "unsafeKeyword") {
-                        const unsafeKeywords = settings().get<string[]>('unsafeKeywords')
-                        this.previewContainer.updateError(null, `unsafe keyword detected. 
+        try {
+            this.previewContainer.clearStoredData()
+            const codeRan = this.toAREPLLogic.onUserInput(text, filePath, vscodeUtils.eol(event), settings().get<boolean>('showGlobalVars'))
+            if (codeRan) this.runningStatus.show();
+        } catch (error) {
+            if (error instanceof Error) {
+                if (error.message == "unsafeKeyword") {
+                    const unsafeKeywords = settings().get<string[]>('unsafeKeywords')
+                    this.previewContainer.updateError(null, `unsafe keyword detected. 
 Doing irreversible operations like deleting folders is very dangerous in a live editor. 
 If you want to continue please clear arepl.unsafeKeywords setting. 
 Currently arepl.unsafeKeywords is set to ["${unsafeKeywords.join('", "')}"]`, true)
-                        return
-                    }
-                    else {
-                        console.error(error)
-                        this.reporter.sendError(error)
-                        this.previewContainer.updateError(null, `internal arepl error: ${error.name} stack: ${error.stack}`, true)
-                    }
+                    return
                 }
-                throw error;
+                else {
+                    console.error(error)
+                    this.reporter.sendError(error)
+                    this.previewContainer.updateError(null, `internal arepl error: ${error.name} stack: ${error.stack}`, true)
+                }
             }
+            throw error;
         }
     }
 
