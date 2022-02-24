@@ -1,8 +1,8 @@
-import {workspace} from "vscode"
+import { workspace } from "vscode"
 
 /**
- * simple alias for workspace.getConfiguration("AREPL")
+ * simple alias for workspace.getConfiguration("ConfigView")
  */
-export function settings(){
-    return workspace.getConfiguration("AREPL")
+export function settings() {
+    return workspace.getConfiguration("ConfigView")
 }

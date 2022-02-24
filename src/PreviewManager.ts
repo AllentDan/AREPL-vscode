@@ -7,7 +7,7 @@ import { EnvironmentVariablesService } from "./env/variables/environment"
 import { join, basename } from "path";
 import { PreviewContainer } from "./previewContainer"
 import Reporter from "./telemetry"
-import { ToAREPLLogic } from "./toAREPLLogic"
+import { ToConfigViewLogic } from "./toConfigViewLogic"
 import { PythonShell } from "python-shell"
 import { settings } from "./settings"
 import printDir from "./printDir";
@@ -26,7 +26,7 @@ export default class PreviewManager {
     pythonEditorDoc: vscode.TextDocument;
     PythonEvaluator: PythonEvaluator;
     runningStatus: vscode.StatusBarItem;
-    toAREPLLogic: ToAREPLLogic
+    toConfigViewLogic: ToConfigViewLogic
     previewContainer: PreviewContainer
     subscriptions: vscode.Disposable[] = []
     highlightDecorationType: vscode.TextEditorDecorationType
@@ -44,7 +44,7 @@ export default class PreviewManager {
     startDisposables() {
         this.runningStatus = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
         this.runningStatus.text = "Running python..."
-        this.runningStatus.tooltip = "AREPL is currently running your python file.  Close the AREPL preview to stop"
+        this.runningStatus.tooltip = "ConfigView is currently running your python file.  Close the ConfigView preview to stop"
         this.reporter = new Reporter(settings().get<boolean>("telemetry"))
 
         this.highlightDecorationType = vscode.window.createTextEditorDecorationType(<vscode.ThemableDecorationRenderOptions>{
@@ -193,9 +193,9 @@ export default class PreviewManager {
         PythonShell.getVersion(`"${pythonPath}"`).then((out) => {
             let version = out.stdout ? out.stdout : out.stderr
             if (version?.includes("Python 3.4") || version?.includes("Python 2")) {
-                vscode.window.showErrorMessage(`AREPL no longer supports ${version}.
-                Please upgrade or set AREPL.pythonPath to a diffent python.
-                AREPL needs python 3.7 or greater`)
+                vscode.window.showErrorMessage(`ConfigView no longer supports ${version}.
+                Please upgrade or set ConfigView.pythonPath to a diffent python.
+                ConfigView needs python 3.7 or greater`)
             }
             if (version) {
                 this.reporter.pythonVersion = version.trim()
@@ -211,7 +211,7 @@ export default class PreviewManager {
     }
 
     /**
-     * starts AREPL python backend and binds print&result output to the handlers
+     * starts ConfigView python backend and binds print&result output to the handlers
      */
     private async startAndBindPython() {
         const pythonPath = await areplUtils.getPythonPath()
@@ -263,7 +263,7 @@ export default class PreviewManager {
             this.reporter.sendError(new Error('exit'), err, 'spawn')
         })
 
-        this.toAREPLLogic = new ToAREPLLogic(this.PythonEvaluator, this.previewContainer)
+        this.toConfigViewLogic = new ToConfigViewLogic(this.PythonEvaluator, this.previewContainer)
 
         // binding this to the class so it doesn't get overwritten by PythonEvaluator
         this.PythonEvaluator.onPrint = this.previewContainer.handlePrint.bind(this.previewContainer)
@@ -291,7 +291,7 @@ export default class PreviewManager {
             if (cachedSettings.get<string>("whenToExecute") == "afterDelay") {
                 let delay = cachedSettings.get<number>("delay");
                 const restartExtraDelay = cachedSettings.get<number>("restartDelay");
-                delay += this.toAREPLLogic.restartMode ? restartExtraDelay : 0
+                delay += this.toConfigViewLogic.restartMode ? restartExtraDelay : 0
                 this.PythonEvaluator.debounce(this.onAnyDocChange.bind(this, e.document), delay)
             }
         }, this, this.subscriptions)
@@ -329,7 +329,7 @@ export default class PreviewManager {
 
         try {
             this.previewContainer.clearStoredData()
-            const codeRan = this.toAREPLLogic.onUserInput(text, filePath, vscodeUtils.eol(event), settings().get<boolean>('showGlobalVars'))
+            const codeRan = this.toConfigViewLogic.onUserInput(text, filePath, vscodeUtils.eol(event), settings().get<boolean>('showGlobalVars'))
             if (codeRan) this.runningStatus.show();
         } catch (error) {
             if (error instanceof Error) {
@@ -371,7 +371,7 @@ Currently arepl.unsafeKeywords is set to ["${unsafeKeywords.join('", "')}"]`, tr
 
         try {
             this.previewContainer.clearStoredData()
-            const codeRan = this.toAREPLLogic.onUserInput('', filePath, '', settings().get<boolean>('showGlobalVars'))
+            const codeRan = this.toConfigViewLogic.onUserInput('', filePath, '', settings().get<boolean>('showGlobalVars'))
             if (codeRan) this.runningStatus.show();
         } catch (error) {
             if (error instanceof Error) {

@@ -1,8 +1,8 @@
 ## ConfigView
 
-AREPL automatically evaluates python code in real-time as you type.
+ConfigView automatically evaluates python configs for [OpenMMLab](https://github.com/open-mmlab). The plugin was modified from [AREPL-vscode](git@github.com:Almenon/AREPL-vscode.git).
 
-AREPL is availible for free on the vscode [marketplace](https://marketplace.visualstudio.com/items?itemName=Allent.config-view#overview).
+ConfigView is availible for free on the vscode [marketplace](https://marketplace.visualstudio.com/items?itemName=Allent.config-view#overview).
 
 ## Usage
 
@@ -13,18 +13,8 @@ Install the python package `mmconfig` through:
 pip install mmconfig
 ```
 
-Open a python file and click on the cat ![cat](./media/happy_cat_24.png)  in the top bar to the right to open AREPL. You can click the cat again to close.
+Open a python file and click on the ![icon](./media/mmConfigView.png)  in the top bar to the right to open ConfigView. You can click the cat again to close.
 
-Or run AREPL through the command search: `control-shift-p`
+Or run ConfigView through the command search: `control-shift-p`
 
 or use the shortcuts: `control-shift-a` (current doc) / `control-shift-q` (new doc)
-
-## Features
-
-* Real-time evaluation: no need to run - AREPL evaluates your code automatically. You can control this (or even turn it off) in the settings.
-
-* Variable display: The final state of your local variables are displayed in a collapsible JSON format.
-
-* Error display: The instant you make a mistake an error with stack trace is shown.
-
-* Settings: AREPL offers many settings to fit your user experience.  Customize the look and feel, debounce time, python options, and more!

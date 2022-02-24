@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 // suite("extension tests", function(){
 //     test("command activates", (done) => {
 //         console.log('starting');
-//         vscode.commands.executeCommand("extension.newAREPLSession").then(() => {
+//         vscode.commands.executeCommand("extension.newConfigViewSession").then(() => {
 //             // what we SHOULD be doing here is getting a promise from the command
 //             // and asserting once the promise is resolved
 //             // but despite returning a promise it comes in as undefined... ugggg

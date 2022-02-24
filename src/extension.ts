@@ -10,30 +10,30 @@ export function activate(context: vscode.ExtensionContext) {
     previewManager = new PreviewManager(context);
 
     // Register the commands that are provided to the user
-    const arepl = vscode.commands.registerCommand("extension.currentAREPLSession", () => {
+    const configView = vscode.commands.registerCommand("extension.currentConfigViewSession", () => {
         previewManager.startArepl();
     });
 
-    const newAreplSession = vscode.commands.registerCommand("extension.newAREPLSession", () => {
+    const newAreplSession = vscode.commands.registerCommand("extension.newConfigViewSession", () => {
         vscodeUtils.newUnsavedPythonDoc(vscodeUtils.getHighlightedText())
             .then(() => { previewManager.startArepl() });
     });
 
-    const closeArepl = vscode.commands.registerCommand("extension.closeAREPL", () => {
+    const closeArepl = vscode.commands.registerCommand("extension.closeConfigView", () => {
         previewManager.dispose()
     });
 
     // exact same as above, just defining command so users are aware of the feature
-    const areplOnHighlightedCode = vscode.commands.registerCommand("extension.newAREPLSessionOnHighlightedCode", () => {
+    const configViewOnHighlightedCode = vscode.commands.registerCommand("extension.newConfigViewSessionOnHighlightedCode", () => {
         vscodeUtils.newUnsavedPythonDoc(vscodeUtils.getHighlightedText())
             .then(() => { previewManager.startArepl() });
     });
 
-    const executeAREPL = vscode.commands.registerCommand("extension.executeAREPL", () => {
+    const executeConfigView = vscode.commands.registerCommand("extension.executeConfigView", () => {
         previewManager.runArepl()
     });
 
-    const executeAREPLBlock = vscode.commands.registerCommand("extension.executeAREPLBlock", () => {
+    const executeConfigViewBlock = vscode.commands.registerCommand("extension.executeConfigViewBlock", () => {
         previewManager.runAreplBlock()
     });
 
@@ -43,12 +43,12 @@ export function activate(context: vscode.ExtensionContext) {
 
     // push to subscriptions list so that they are disposed automatically
     context.subscriptions.push(...[
-        arepl,
+        configView,
         newAreplSession,
         closeArepl,
-        areplOnHighlightedCode,
-        executeAREPL,
-        executeAREPLBlock,
+        configViewOnHighlightedCode,
+        executeConfigView,
+        executeConfigViewBlock,
         printDir
     ]);
 }

@@ -4,10 +4,10 @@ import pyGuiLibraryIsPresent from "./pyGuiLibraryIsPresent"
 import { settings } from "./settings"
 
 /**
- * formats text for passing into AREPL backend
+ * formats text for passing into ConfigView backend
  * Along the way decides whether backend needs restarting
  */
-export class ToAREPLLogic {
+export class ToConfigViewLogic {
 
     restartMode: boolean
     restartedLastTime = false

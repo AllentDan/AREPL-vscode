@@ -55,7 +55,7 @@ suite("PreviewContainer and pythonPanelPreview Tests", () => {
 
     test("spawn error", function () {
         previewContainer.displayProcessError("python3 -u ENOENT")
-        assert.equal(panel.webview.html.includes("Error in the AREPL extension"), true, panel.webview.html);
+        assert.equal(panel.webview.html.includes("Error in the ConfigView extension"), true, panel.webview.html);
     });
 
     test("error name appears in preview", function () {

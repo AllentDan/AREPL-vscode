@@ -22,9 +22,9 @@ import vscodeUtilities from '../src/vscodeUtilities'
 import { sep } from 'path';
 import { EOL } from 'os';
 
-suite('vscode utilities tests', ()=>{
+suite('vscode utilities tests', () => {
 
-    test('eol as string', ()=>{
+    test('eol as string', () => {
         const d = new vscodeMock.TextDocument("", "")
         assert.strictEqual(vscodeUtilities.eol(<any>d), "\n")
 
@@ -44,16 +44,16 @@ suite('vscode utilities tests', ()=>{
         });
 
         test('should make relative paths absolute', () => {
-            assert.strictEqual(vscodeUtilities.expandPathSetting(`foo${sep}.env`), `${sep+sep}foo${sep}.env`)
+            assert.strictEqual(vscodeUtilities.expandPathSetting(`foo${sep}.env`), `${sep + sep}foo${sep}.env`)
         });
-        
+
         test('should not change absolute paths', () => {
             assert.strictEqual(vscodeUtilities.expandPathSetting(__dirname), __dirname)
         });
     });
 
     // get bizarre error with this one
-    // bad option: --extensionTestsPath=c:\dev\AREPL-vscode\test\suite\index
+    // bad option: --extensionTestsPath=c:\dev\ConfigView-vscode\test\suite\index
     // can't even run it
     // suite('new unsaved python doc', () => {
     //     it('should return a doc', (done) => {

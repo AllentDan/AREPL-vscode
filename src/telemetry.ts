@@ -26,7 +26,7 @@ export default class Reporter {
         try {
             instrumentation_key = readFileSync(join(extension.extensionPath, "media", 'instrumentation_key.txt')).toString()
         } catch (error) {
-            console.warn('no instrumentation key for AREPL found - disabling telemetry')
+            console.warn('no instrumentation key for ConfigView found - disabling telemetry')
             this.enabled = false;
             // TelemetryReporter raises error if falsy key so we need to escape before we hit it
             return

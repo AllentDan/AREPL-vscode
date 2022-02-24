@@ -1,16 +1,16 @@
 import * as vscode from "vscode"
 import Reporter from "./telemetry"
 import { UserError, FrameSummary } from "arepl-backend";
-import Utilities, {DefaultDict} from "./utilities";
+import Utilities, { DefaultDict } from "./utilities";
 
 /**
  * shows error icons
  */
-export default class PythonInlinePreview{
+export default class PythonInlinePreview {
     public printResults: string[];
     public errorDecorationType: vscode.TextEditorDecorationType
 
-    constructor(private reporter: Reporter, context: vscode.ExtensionContext){
+    constructor(private reporter: Reporter, context: vscode.ExtensionContext) {
         this.errorDecorationType = vscode.window.createTextEditorDecorationType({
             gutterIconPath: context.asAbsolutePath('media/red.jpg'),
         })
@@ -19,17 +19,17 @@ export default class PythonInlinePreview{
     /**
      * Safe - catches and logs any exceptions
      */
-    public showInlineErrors(error: UserError, userErrorMsg: string){
+    public showInlineErrors(error: UserError, userErrorMsg: string) {
         try {
 
-            if(userErrorMsg.includes("AREPL has ran into an error")){
+            if (userErrorMsg.includes("ConfigView has ran into an error")) {
                 // this.showInternalError(userErrorMsg)
                 // return
             }
 
             const decorations = this.convertErrorToDecorationOptions(error)
-            
-            if(vscode.window.activeTextEditor){
+
+            if (vscode.window.activeTextEditor) {
                 vscode.window.activeTextEditor.setDecorations(
                     // <string> indicates the main arepl file
                     this.errorDecorationType, decorations["<string>"]
@@ -37,21 +37,21 @@ export default class PythonInlinePreview{
             }
 
         } catch (internalError) {
-            if(internalError instanceof Error){
+            if (internalError instanceof Error) {
                 this.reporter.sendError(internalError)
             }
-            else{
+            else {
                 this.reporter.sendError(new Error(internalError))
             }
         }
     }
 
-    private showInternalError(internalError: string){
+    private showInternalError(internalError: string) {
         throw Error('not implemented')
     }
 
-    private convertFrameToDecorationOption(frame: FrameSummary): vscode.DecorationOptions{
-        const lineNum = frame.lineno-1 // python trace uses 1-based indexing but vscode lines start at 0
+    private convertFrameToDecorationOption(frame: FrameSummary): vscode.DecorationOptions {
+        const lineNum = frame.lineno - 1 // python trace uses 1-based indexing but vscode lines start at 0
         // todo: pull endCharNum from relevant line from file
         // remember that the file might not be the active doc...
         const endCharNum = 0
@@ -73,10 +73,10 @@ export default class PythonInlinePreview{
     /**
      * converts error to dictionary of error decorations indexed by filename
      */
-    private convertErrorToDecorationOptions(error: UserError): Record<string, vscode.DecorationOptions[]>{
+    private convertErrorToDecorationOptions(error: UserError): Record<string, vscode.DecorationOptions[]> {
         const decorations = new DefaultDict(Array)
 
-        if(Utilities.isEmpty(error)) return {'<string>': []};
+        if (Utilities.isEmpty(error)) return { '<string>': [] };
 
         const flattenedErrors = Utilities.flattenNestedObjectWithMultipleKeys(error, ["__context__", "__cause__"])
 

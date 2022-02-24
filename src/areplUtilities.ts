@@ -1,19 +1,19 @@
 "use strict"
 import * as vscode from "vscode";
-import {EOL} from "os"
-import {settings} from "./settings"
+import { EOL } from "os"
+import { settings } from "./settings"
 import { PythonShell } from "python-shell";
 import vscodeUtils from "./vscodeUtilities"
 
 /**
- * utilities specific to AREPL
+ * utilities specific to ConfigView
  */
 export default class areplUtils {
 
-    static getEnvFilePath(){
-        let envFilePath = vscodeUtils.getSettingOrOtherExtSettingAsDefault<string>("AREPL", "python", "envFile")
+    static getEnvFilePath() {
+        let envFilePath = vscodeUtils.getSettingOrOtherExtSettingAsDefault<string>("ConfigView", "python", "envFile")
 
-        if(!envFilePath) envFilePath = "${workspaceFolder}/.env"
+        if (!envFilePath) envFilePath = "${workspaceFolder}/.env"
 
         return vscodeUtils.expandPathSetting(envFilePath)
     }
@@ -32,31 +32,31 @@ export default class areplUtils {
                 await extension.activate()
             }
             const pythonPath = extension.exports.settings.getExecutionDetails(resource).execCommand
-            if(!pythonPath){
+            if (!pythonPath) {
                 const pythonPath = settings().get<string>('pythonPath')
                 return pythonPath ? pythonPath : PythonShell.defaultPythonPath
             }
             return pythonPath[0]; // might be more elements if conda, but we are not bothering to support that yet
         } else {
-            let pythonPath = vscodeUtils.getSettingOrOtherExtSettingAsDefault<string>("AREPL", "python", "pythonPath")
-            if(!pythonPath) pythonPath = PythonShell.defaultPythonPath
+            let pythonPath = vscodeUtils.getSettingOrOtherExtSettingAsDefault<string>("ConfigView", "python", "pythonPath")
+            if (!pythonPath) pythonPath = PythonShell.defaultPythonPath
             return vscodeUtils.expandPathSetting(pythonPath)
         }
     }
 
-    static insertDefaultImports(editor: vscode.TextEditor){
+    static insertDefaultImports(editor: vscode.TextEditor) {
         return editor.edit((editBuilder) => {
             let imports = settings().get<string[]>("defaultImports")
 
             imports = imports.filter(i => i.trim() != "")
-            if(imports.length == 0) return
+            if (imports.length == 0) return
 
             imports = imports.map(i => {
                 const words = i.split(" ")
 
                 // python import syntax: "import library" or "from library import method"
                 // so if user didnt specify import we will do that for them :)
-                if(words[0] != "import" && words[0] != "from" && words[0].length > 0){
+                if (words[0] != "import" && words[0] != "from" && words[0].length > 0) {
                     i = "import " + i
                 }
 

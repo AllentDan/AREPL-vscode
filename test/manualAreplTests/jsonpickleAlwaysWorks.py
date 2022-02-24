@@ -1,19 +1,24 @@
 class foo:
+
     def __getstate__(self):
         a
+
+
 f = foo()
 
+
 class foo2:
+
     def __getstate__(self):
         return "custom display"
+
+
 g = foo2()
 
 good = "good"
-
-
 """ EXPECTED RESULT
 -{
-    f: "AREPL could not pickle this object",
+    f: "ConfigView could not pickle this object",
     foo: -{
         py/type: "__main__.foo"
     },

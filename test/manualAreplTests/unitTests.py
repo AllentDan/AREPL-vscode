@@ -1,5 +1,6 @@
 import unittest
 
+
 class TestStringMethods(unittest.TestCase):
 
     def test_upper(self):
@@ -16,8 +17,9 @@ class TestStringMethods(unittest.TestCase):
         with self.assertRaises(TypeError):
             s.split(2)
 
+
 if __name__ == '__main__':
     unittest.main()
 
 # note that there is bug where it says ran 0 tests
-# see https://github.com/Almenon/AREPL-vscode/issues/104
+# see https://github.com/Almenon/ConfigView-vscode/issues/104

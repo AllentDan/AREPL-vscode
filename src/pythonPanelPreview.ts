@@ -6,7 +6,7 @@ import Utilities from "./utilities"
 import { settings } from "./settings"
 
 /**
- * shows AREPL output (variables, errors, timing, and stdout/stderr)
+ * shows ConfigView output (variables, errors, timing, and stdout/stderr)
  * https://code.visualstudio.com/docs/extensions/webview
  */
 export default class PythonPanelPreview {
@@ -19,92 +19,6 @@ export default class PythonPanelPreview {
     private lastTime: number = 999999999;
 
     private html;
-
-    private readonly landingPage = `
-    <br>
-    <p style="font-size:14px">Start typing or make a change and your code will be evaluated.</p>
-    
-    <p style="font-size:14px">⚠ <b style="color:red">WARNING:</b> code is evaluated WHILE YOU TYPE - don't try deleting files/folders! ⚠</p>
-    <p>evaluation while you type can be turned off or adjusted in the settings</p>
-    <br>
-    <h3>AREPL v2.0.3 🐛 - Flamingo</h3>
-    <ul>
-    <li>🐛 Fixed python path from python extension no longer being automatically used by AREPL</li>
-    <li>Help me make arepl better by filling out this short survey: <a href="https://forms.gle/m7xirfRnSRoPAe9e9">https://forms.gle/m7xirfRnSRoPAe9e9</a></li>
-    </ul>
-    <br>
-    
-    <h3>Examples</h3>
-    
-<h4>Simple List</h4>
-<code style="white-space:pre-wrap">
-x = [1,2,3]
-y = [num*2 for num in x]
-print(y)
-</code>
-
-<h4>Dumping</h4>
-<code style="white-space:pre-wrap">
-from arepl_dump import dump 
-
-def milesToKilometers(miles):
-    kilometers = miles*1.60934
-    dump() # dumps all the vars in your function
-
-    # or dump when function is called for a second time
-    dump(None,1) 
-
-milesToKilometers(2*2)
-milesToKilometers(3*3)
-
-for char in ['a','b','c']:
-    dump(char,2) # dump a var at a specific iteration
-
-a=1
-dump(a) # dump specific vars at any point in your program
-a=2
-</code>
-
-<h4>Turtle</h4>
-<code style="white-space:pre-wrap">
-import turtle
-
-# window in right hand side of screen
-turtle.setup(500,500,-1,0)
-
-# you can comment this out to keep state inbetween runs
-turtle.reset()
-
-turtle.forward(100)
-turtle.left(90)
-</code>
-
-<h4>Web call</h4>
-<code style="white-space:pre-wrap">
-import requests
-import datetime as dt
-
-r = requests.get("https://api.github.com")
-
-#$save
-# #$save saves state so request is not re-executed when modifying below
-
-now = dt.datetime.now()
-if r.status_code == 200:
-    print("API up at " + str(now))
-
-</code>`;
-    private readonly footer = `<br><br>
-        <div id="footer">
-        <p style="margin:0px;">
-            report an <a href="https://github.com/almenon/arepl-vscode/issues">issue</a>  |
-            ⭐ <a href="https://marketplace.visualstudio.com/items?itemName=Allent.arepl#review-details">rate me</a> ⭐ |
-            talk on <a href="https://gitter.im/arepl/lobby">gitter</a> |
-                <a href="https://twitter.com/intent/tweet?button_hashtag=arepl" id="twitterButton">
-                    <i id="twitterIcon"></i>Tweet #arepl</a>
-        </p>
-        </div>`
-
     private css: string
     private jsonRendererScript: string;
     private errorContainer = ""
@@ -127,7 +41,7 @@ if r.status_code == 200:
     }
 
     start(linkedFileName: string) {
-        this.panel = vscode.window.createWebviewPanel("arepl", "AREPL - " + linkedFileName, vscode.ViewColumn.Two, {
+        this.panel = vscode.window.createWebviewPanel("arepl", "ConfigView - " + linkedFileName, vscode.ViewColumn.Two, {
             enableScripts: true
         });
 
@@ -190,7 +104,7 @@ if r.status_code == 200:
         // escape any accidental html
         printResults = Utilities.escapeHtml(printResults);
 
-        this.printContainer = `<br><h3>View Config:</h3><div class="print"><pre><code class="python">${printResults}</code></pre></div>`
+        this.printContainer = `<br><div class="print"><pre><code class="python">${printResults}</code></pre></div>`
         this.throttledUpdate();
     }
 
@@ -199,7 +113,7 @@ if r.status_code == 200:
     }
 
     public displayProcessError(err: string) {
-        let errMsg = `Error in the AREPL extension!\n${err}`
+        let errMsg = `Error in the ConfigView extension!\n${err}`
         if (err.includes("ENOENT") || err.includes("9009")) { // NO SUCH FILE OR DIRECTORY
             // user probably just doesn't have python installed
             errMsg = errMsg + `\n\nAre you sure you have installed python 3 and it is in your PATH?
@@ -251,7 +165,7 @@ if r.status_code == 200:
         this.html = `<!doctype html>
         <html lang="en">
         <head>
-            <title>AREPL</title>
+            <title>ConfigView</title>
             ${this.css}
             <style>${this.customCSS}</style>
             ${this.jsonRendererScript}

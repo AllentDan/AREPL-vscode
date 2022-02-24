@@ -43,7 +43,7 @@ suite("PreviewManager and pythonPanelPreview Tests", () => {
         assert.equal(panel.visible, true)
     });
 
-    // todo: fix test (see https://github.com/Almenon/AREPL-vscode/issues/355)
+    // todo: fix test (see https://github.com/Almenon/ConfigView-vscode/issues/355)
     // test("edits should result in webview change", function(done){
     //     editor.edit(editBuilder => {
     //         editBuilder.insert(new vscode.Position(0,0), "x=3424523;")
