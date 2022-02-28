@@ -181,7 +181,7 @@
         "ConfigView.defaultImports": {
           "type": "array",
           "default": [
-            "from arepl_dump import dump"
+            ""
           ],
           "description": "Default imports for new ConfigView sessions. dump is included by default so you can use it to inspect variables & local scopes"
         },
