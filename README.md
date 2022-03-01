@@ -27,3 +27,4 @@ or use the shortcuts: `control-shift-a` (current doc) / `control-shift-q` (new d
 
 ## Reference
 - [AREPL-vscode](git@github.com:Almenon/AREPL-vscode.git)
+- [open-file-from-path](git@github.com:Jack89ita/vscode-open-file-from-path.git)

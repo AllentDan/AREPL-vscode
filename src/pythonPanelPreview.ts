@@ -51,6 +51,10 @@ export default class PythonPanelPreview {
         return this.panel;
     }
 
+    public updateLinkedFileName(linkedFileName: string) {
+        this.panel.title = "ConfigView - " + linkedFileName
+    }
+
     public updateVars(vars: object) {
         let userVarsCode = `userVars = ${JSON.stringify(vars)};`
 

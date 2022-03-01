@@ -2,10 +2,13 @@
 import * as vscode from "vscode";
 import PreviewManager from "./PreviewManager"
 import vscodeUtils from "./vscodeUtilities";
+import { _openFileFromPath } from "./openFilePath";
 
 let previewManager: PreviewManager = null;
 
 export function activate(context: vscode.ExtensionContext) {
+
+    const openFileFromPath = vscode.commands.registerCommand('extension.openConfigFilePath', () => _openFileFromPath());
 
     previewManager = new PreviewManager(context);
 
@@ -49,6 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
         configViewOnHighlightedCode,
         executeConfigView,
         executeConfigViewBlock,
-        printDir
+        printDir,
+        openFileFromPath
     ]);
 }

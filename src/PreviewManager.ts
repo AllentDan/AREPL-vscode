@@ -303,6 +303,7 @@ export default class PreviewManager {
         vscode.workspace.onDidOpenTextDocument((e) => {
             if (e != this.pythonEditorDoc) {
                 this.pythonEditorDoc = vscode.window.activeTextEditor.document
+                this.previewContainer.updateLinkedFileName(basename(this.pythonEditorDoc.fileName))
                 this.initDocRun()
             }
 

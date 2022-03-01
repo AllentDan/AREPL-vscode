@@ -27,6 +27,10 @@ export class PreviewContainer {
         return this.pythonPanelPreview.start(linkedFileName)
     }
 
+    public updateLinkedFileName(linkedFileName: string) {
+        this.pythonPanelPreview.updateLinkedFileName(linkedFileName)
+    }
+
     /**
      * clears stored data (preview gui is unaffected)
      */
