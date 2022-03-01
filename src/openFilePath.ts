@@ -35,9 +35,9 @@ export function _openFileFromPath() {
     var currentlyOpenTabfilePath = editor.document.fileName;
     let currentWorkspaceFolder: string = '';
     for (let i = 0; i < vscode.workspace.workspaceFolders.length; i++) {
-        const index_out = currentlyOpenTabfilePath.indexOf(vscode.workspace.workspaceFolders[i].uri.path);
+        const index_out = currentlyOpenTabfilePath.indexOf(vscode.workspace.workspaceFolders[i].uri.fsPath);
         if (index_out == 0) {
-            currentWorkspaceFolder = vscode.workspace.workspaceFolders[i].uri.path;
+            currentWorkspaceFolder = vscode.workspace.workspaceFolders[i].uri.fsPath;
             break;
         }
     }
