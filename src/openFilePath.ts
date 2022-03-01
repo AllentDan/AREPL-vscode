@@ -4,7 +4,6 @@
 import * as vscode from "vscode"
 import * as path from "path"
 import * as recursive from "recursive-readdir"
-import vscodeUtils from "./vscodeUtilities"
 
 //Get preferences
 const preferences = vscode.workspace.getConfiguration('ConfigView.openConfigFilePath');

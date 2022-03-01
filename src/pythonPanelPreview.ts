@@ -42,7 +42,8 @@ export default class PythonPanelPreview {
 
     start(linkedFileName: string) {
         this.panel = vscode.window.createWebviewPanel("arepl", "ConfigView - " + linkedFileName, vscode.ViewColumn.Two, {
-            enableScripts: true
+            enableScripts: true,
+            enableFindWidget: true
         });
 
         this.css = `<link rel="stylesheet" type="text/css" href="${this.getMediaPath("pythonPanelPreview.css", this.panel.webview)}">`
@@ -178,6 +179,13 @@ export default class PythonPanelPreview {
                     href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
             <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
             <script>hljs.initHighlightingOnLoad();</script>
+            <script>
+              window.addEventListener('dblclick', function(evt) {
+                console.log('keyboard F typed!');
+                console.log(evt.target);
+                console.log(evt.pageY);
+              })
+            </script>
         </head>
         <body>
             ${this.errorContainer}
