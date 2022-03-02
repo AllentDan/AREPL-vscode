@@ -109,7 +109,8 @@ export default class PythonPanelPreview {
         // escape any accidental html
         printResults = Utilities.escapeHtml(printResults);
 
-        this.printContainer = `<br><div class="print"><pre><code class="python">${printResults}</code></pre></div>`
+        this.printContainer = `<br><div class="print"><pre><code class="python" \
+                style="font-family:consolas;font-size:16px">${printResults}</code></pre></div>`
         this.throttledUpdate();
     }
 
@@ -180,10 +181,9 @@ export default class PythonPanelPreview {
             <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
             <script>hljs.initHighlightingOnLoad();</script>
             <script>
-              window.addEventListener('dblclick', function(evt) {
-                console.log('keyboard F typed!');
-                console.log(evt.target);
-                console.log(evt.pageY);
+              window.addEventListener('dblclick', function(e) {
+                console.log(e.target);
+                console.log(e.pageX, e.pageY, e.clientX, e.clientY, e.offsetX, e.offsetY);
               })
             </script>
         </head>
@@ -191,7 +191,7 @@ export default class PythonPanelPreview {
             ${this.errorContainer}
             ${this.printContainer}
             ${this.timeContainer}
-            <div id="${Math.random()}" style="display:none"></div>
+            <div id="${Math.random()}" style="display:none></div>
         </body>
         </html>`
         // the weird div with a random id above is necessary
