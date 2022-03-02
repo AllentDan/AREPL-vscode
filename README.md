@@ -6,6 +6,8 @@ ConfigView is availible for free on the vscode [marketplace](https://marketplace
 
 ## Usage
 
+![](media/demo.gif)
+
 First, make sure you have [python 3.7 or greater](https://www.python.org/downloads/) installed.
 
 Install the python package `mmconfig` through:
