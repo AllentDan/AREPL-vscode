@@ -91,7 +91,11 @@ export class ToConfigViewLogic {
             this.restartedLastTime = false;
         }
         else {
-            data.evalCode = `from mmconfig import Config\nprint(Config.fromfile("${data.filePath}").pretty_text)`
+            const searchRegExp = /\\/g;
+            const replaceWith = '\\\\';
+            let file_path = String.raw`${data.filePath}`;
+            file_path = file_path.replace(searchRegExp, replaceWith);
+            data.evalCode = `from mmconfig import Config\nprint(Config.fromfile("${file_path}").pretty_text)`
             this.PythonEvaluator.execCode(data)
         }
 

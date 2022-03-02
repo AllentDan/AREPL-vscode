@@ -2,7 +2,7 @@
   "name": "config-view",
   "displayName": "Config View",
   "description": "Modified from arepl-python to view mm configs",
-  "version": "0.0.5",
+  "version": "0.1.1",
   "publisher": "Allent",
   "engines": {
     "vscode": "^1.36.0"
